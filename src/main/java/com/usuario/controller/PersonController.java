@@ -32,18 +32,14 @@ public class PersonController {
     @GetMapping("find-all-person")
     public ResponseEntity<List<PersonDTO>> getAllPerson(@RequestHeader("Authorization") String token){
 
-        /*if(!interceptor.validate(token)){
-            return ResponseEntity.badRequest().build();
-        }*/
 
-        if(interceptor.validateRole(token, "admin")){
-            logger.info("O usuario eh administrador");
-        }
-        if(interceptor.validateRole(token, "seller")){
-            logger.info("Voce eh seller");
-        }
-        if(interceptor.validateRole(token, "buyer")){
-            logger.info("Voce eh buyer");
+
+        if(!interceptor.validate(token)){
+            return ResponseEntity.badRequest().build();
+        }if(interceptor.validateRole(token, "admin")){
+            logger.info("voce eh admin");
+        }else{
+            logger.info("voce nao eh admin");
         }
 
         try {

@@ -33,53 +33,22 @@ public class Interceptor {
 
     }
 
-    public boolean validateRole(String token, String requirement){
+    public boolean validateRole(String token, String requirement) {
 
-        if(token == null){
+        if (token == null) {
             return false;
         }
 
-        switch (requirement){
+        String tokenDecoded = Jwts.parserBuilder()
+                .setSigningKey(CHAVE)
+                .build()
+                .parseClaimsJws(token)
+                .getBody().getSubject();
 
-            case "admin":
-                try {
-                    Jwts.parserBuilder()
-                            .setSigningKey(CHAVE)
-                            .build()
-                            .parseClaimsJws(token)
-                            .getBody().getSubject().equals("admin");
-                    return true;
-                }catch (Exception e){
-                    return false;
-                }
-
-            case "buyer":
-                try {
-                    Jwts.parserBuilder()
-                            .setSigningKey(CHAVE)
-                            .build()
-                            .parseClaimsJws(token)
-                            .getBody().getSubject().equals("buyer");
-                    return true;
-                }catch (Exception e){
-                    return false;
-                }
-
-            case "seller":
-                try {
-                    Jwts.parserBuilder()
-                            .setSigningKey(CHAVE)
-                            .build()
-                            .parseClaimsJws(token)
-                            .getBody().getSubject().equals("seller");
-                    return true;
-                }catch (Exception e){
-                    return false;
-                }
-
-            default:
-                return false;
+        if (tokenDecoded.equals(requirement)) {
+            return true;
         }
+        return false;
     }
 
 }
