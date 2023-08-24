@@ -32,22 +32,17 @@ public class PersonController {
     @GetMapping("find-all-person")
     public ResponseEntity<List<PersonDTO>> getAllPerson(@RequestHeader("Authorization") String token){
 
-
-
-        if(!interceptor.validate(token)){
-            return ResponseEntity.badRequest().build();
-        }if(interceptor.validateRole(token, "admin")){
-            logger.info("voce eh admin");
-        }else{
-            logger.info("voce nao eh admin");
+        if(!interceptor.validateRole(token, "admin")){
+            logger.info("Acesso negado a essa informacao devido a falta de acesso administrador");
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
 
         try {
             List<Person> personList = iPersonRepository.findAll();
             List<PersonDTO> personWithoutString = new ArrayList<>();
 
-            PersonDTO personDTO = new PersonDTO();
             for(Person person: personList){
+                PersonDTO personDTO = new PersonDTO();
                 personDTO.setId(person.getId());
                 personDTO.setAge(person.getAge());
                 personDTO.setEmail(person.getEmail());
@@ -70,35 +65,40 @@ public class PersonController {
     @GetMapping("find/{id}")
     public ResponseEntity<PersonDTO> getPersonById(@PathVariable Long id, @RequestHeader("Authorization") String token){
 
-        if(!interceptor.validate(token)){
-            return ResponseEntity.badRequest().build();
-        }
+        if(!interceptor.validateRole(token, "admin")) {
 
-        try {
+            if(!interceptor.validateOwnId(token, id)){
+                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            }
+        }
             Person person = iPersonRepository.findById(id).get();
 
-            PersonDTO personWithoutString = new PersonDTO();
-            personWithoutString.setId(person.getId());
-            personWithoutString.setFirstName(person.getFirstName());
-            personWithoutString.setLastName(person.getLastName());
-            personWithoutString.setAge(person.getAge());
-            personWithoutString.setEmail(person.getEmail());
-            personWithoutString.setRole(person.getRole());
+            try {
 
+                PersonDTO personWithoutString = new PersonDTO();
+                personWithoutString.setId(person.getId());
+                personWithoutString.setFirstName(person.getFirstName());
+                personWithoutString.setLastName(person.getLastName());
+                personWithoutString.setAge(person.getAge());
+                personWithoutString.setEmail(person.getEmail());
+                personWithoutString.setRole(person.getRole());
 
-            return new ResponseEntity<>(personWithoutString, HttpStatus.OK);
-        }catch (Exception e){
-            logger.error("Erro ao encontrar o usuario", e);
+                return new ResponseEntity<>(personWithoutString, HttpStatus.OK);
 
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
+            } catch (Exception e) {
+                logger.error("Erro ao encontrar o usuario", e);
+
+                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            }
     }
 
     @PostMapping("save-person")
     public ResponseEntity savePerson(@RequestBody Person person, @RequestHeader("Authorization") String token){
 
-        if(!interceptor.validate(token)){
-            return ResponseEntity.badRequest().build();
+        if(!interceptor.validateRole(token, "admin")){
+
+            logger.error("Erro ao cadastrar usuario por falta de acesso administrador");
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
 
         try {
@@ -117,8 +117,12 @@ public class PersonController {
     @PutMapping("update-person/{id}")
     public ResponseEntity updatePerson(@RequestBody Person person, @PathVariable Long id, @RequestHeader("Authorization") String token){
 
-        if(!interceptor.validate(token)){
-            return ResponseEntity.badRequest().build();
+        if(!interceptor.validateRole(token, "admin")){
+
+            if(!interceptor.validateOwnId(token, id)){
+                logger.info("Nao foi possivel atualizar o usuario");
+                return ResponseEntity.badRequest().build();
+            }
         }
 
         try {
@@ -145,8 +149,11 @@ public class PersonController {
     @DeleteMapping("delete/{id}")
     public ResponseEntity deletePerson(@PathVariable Long id, @RequestHeader("Authorization") String token){
 
-        if(!interceptor.validate(token)){
-            return ResponseEntity.badRequest().build();
+        if(!interceptor.validateRole(token, "admin")){
+
+            if(!interceptor.validateOwnId(token, id)){
+                return ResponseEntity.badRequest().build();
+            }
         }
 
         try {

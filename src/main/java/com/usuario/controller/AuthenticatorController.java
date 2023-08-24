@@ -45,7 +45,8 @@ public class AuthenticatorController{
             }
 
             String jwtToken = Jwts.builder()
-                    .setSubject(listPerson.get(0).getRole())
+                    .claim("id", listPerson.get(0).getId())
+                    .claim("role", listPerson.get(0).getRole())
                     .setIssuedAt(new Date())
                     .setExpiration(
                             Date.from(LocalDateTime.now().plusMinutes(2L)
