@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class Interceptor {
@@ -20,20 +22,31 @@ public class Interceptor {
                     .getBytes(StandardCharsets.UTF_8));
 
 
-    public boolean validate(String token){
+    public Map<String, String> validate(String token){
 
         if(token == null){
-            return false;
+            logger.error("Token invalido");
+            return new HashMap<>();
         }
 
         try {
-            Jwts.parserBuilder()
+            Claims tokenDecoded = Jwts.parserBuilder()
                     .setSigningKey(CHAVE)
                     .build()
-                    .parseClaimsJws(token);
-            return true;
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            String role = tokenDecoded.get("role", String.class);
+            Long idUser = tokenDecoded.get("id", Long.class);
+
+            Map<String, String> mapUser = new HashMap<>();
+            mapUser.put("role", role);
+            mapUser.put("id", idUser.toString());
+
+            return mapUser;
         }catch (Exception e){
-            return false;
+            logger.error("Token invalido", e);
+            return new HashMap<>();
         }
 
     }

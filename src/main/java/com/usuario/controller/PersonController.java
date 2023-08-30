@@ -1,5 +1,7 @@
 package com.usuario.controller;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.usuario.model.Person;
 import com.usuario.model.PersonDTO;
 import com.usuario.repository.IPersonRepository;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "person/")
@@ -169,6 +172,15 @@ public class PersonController {
 
         }
 
+    }
+
+    @PostMapping("validate")
+    public ResponseEntity validate(@RequestBody String token){
+
+        JsonObject tokenJson = JsonParser.parseString(token).getAsJsonObject();
+        Map response = interceptor.validate(tokenJson.get("token").getAsString());
+
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
 }
