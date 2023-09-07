@@ -1,2 +1,3 @@
-INSERT INTO PERSON (first_name, last_name, age, email, password, cnpj, role) VALUES ('Fulano', 'da Silva', 32, 'fulano@gmail.com', 'fulano1234', '1234577340001', 'seller')
+INSERT INTO PERSON (first_name, last_name, age, email, password, cnpj, role) VALUES ('Fulano', 'da Silva', 32, 'fulano@gmail.com', 'fulano1234', '1234577340001', 'vendedor')
 INSERT INTO PERSON (first_name, last_name, age, email, password, cnpj, role) VALUES ('Ciclano', 'Souza', 25, 'ciclano@gmail.com', 'ciclano123', '1234577340001', 'admin')
+INSERT INTO PERSON (first_name, last_name, age, email, password, cnpj, role) VALUES ('Caio', 'Santos', 25, 'caio@gmail.com', 'caio123', '12367535880002', 'comprador')

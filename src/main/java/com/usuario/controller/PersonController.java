@@ -104,6 +104,11 @@ public class PersonController {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
 
+        if(!validateEmail(person.getEmail())){
+            logger.error("Usuario ja existe");
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+
         try {
             iPersonRepository.save(person);
             logger.info("Usuario cadastrado com sucesso!");
@@ -115,6 +120,19 @@ public class PersonController {
         }
 
 
+    }
+
+    private boolean validateEmail(String email){
+        try {
+            List<Person> listEmail = iPersonRepository.findByEmail(email);
+            if(listEmail.isEmpty()){
+                logger.info("email nao cadastrado");
+                return true;
+            }
+        }catch (Exception e){
+            logger.error("Ocorreu um erro: ", e);
+        }
+        return false;
     }
 
     @PutMapping("update-person/{id}")
